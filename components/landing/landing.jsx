@@ -1,12 +1,22 @@
 import React from 'react'
+import HeroSection from "./heroSection"
+import FeatureSection from "./featureSection"
+import StepsSection from "./stepsSection"
+import Reserch from "./reserch"
+import Faq from "./faq"
+import Join from "./join"
 
 const landing = () => {
-  return (
-    <div className='flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center px-6'>
-      hwy i am home
-
-    </div>
-  )
+    return (
+        <div className=''>
+            <HeroSection />
+            <FeatureSection/>
+            <StepsSection/>
+            <Reserch/>
+            <Faq/>
+            <Join/>
+        </div>
+    )
 }
 
 export default landing

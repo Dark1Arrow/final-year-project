@@ -1,53 +1,43 @@
-import React from 'react'
+import { ArrowRight } from 'lucide-react';
 
 const HeroSection = () => {
-    return (
-        <div>
-            <section className="relative bg-gray-50 min-h-[90vh] flex items-center">
-                <div className="bg-[#000000] absolute top-0 left-0 h-[100%] w-[100%] z-0 overflow-hidden ">
-                    <div className="absolute left-[20%] bottom-[-70%] w-[1500px] h-[1500px] bg-[#171717] rounded-full flex items-center justify-center">
-                        {/* Second Circle */}
-                        <div className="w-[1000px] h-[1000px] bg-[#343434] rounded-full flex items-center justify-center">
-                            {/* Third Circle */}
-                            <div className="w-[500px] h-[500px] bg-[#686868] rounded-full"></div>
-                        </div>
-                    </div>
-                </div>
-                <div className="absolute top-0 left-[5%] right-[5%] h-[100%] boarder border-2 z-1 max-w-[90%] px-6 md:px-12 grid md:grid-cols-2 gap-8 items-center text-left">
 
-                    {/* Left Content */}
-                    <div>
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-[white]">
-                            Nutrition tracking
-                            for <span className="text-green-500">Real life</span> Starts Here
-                        </h1>
-                        <p className="text-[white] mt-4 text-lg">
-                            Make progress with the all-in-one food, exercise, and calorie tracker.
-                        </p>
+  return (
+    <section className="relative w-full h-[600px] md:h-[700px] bg-gray-600 overflow-hidden">
 
-                        {/* Buttons */}
-                        <div className="mt-6 flex space-x-4">
-                            <a
-                                href="/how-it-works"
-                                className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition"
-                            >
-                                Get Started
-                            </a>
-                        </div>
-                    </div>
+      <div 
+        className="absolute inset-0 bg-cover bg-center" 
+        style={{ 
+          backgroundImage: `url("/sunset-pool.png")`,
+          backgroundColor: '#9ca3af' 
+        }}
+      >
+      </div>
 
-                    {/* Right Image */}
-                    <div className="hidden md:flex justify-center">
-                        <img
-                            src="https://www.myfitnesspal.com/_next/image?url=%2Fpages%2Fhome%2Flogged-out-v2%2Fhero-phone-large.png&w=512&q=75"
-                            alt="Fitness Illustration"
-                            className="w-[150px] md:w-[150px]"
-                        />
-                    </div>
-                </div>
-            </section>
+      <div className="absolute inset-0 bg-black opacity-30"></div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center">
+        <div className="text-white max-w-xl">
+
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4">
+            Your Next Home,
+            <br />
+            Secured by Blockchain
+          </h1>
+
+          <p className="text-lg sm:text-xl font-light mb-8">
+            Connect directly with landlords and tenants using smart contracts for a seamless experience.
+          </p>
+
+          <button className="flex items-center space-x-2 px-8 py-3 bg-white text-gray-800 font-semibold text-lg rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+            <span>Start Now</span>
+            <ArrowRight className="h-5 w-5 ml-1" />
+          </button>
+          
         </div>
-    )
-}
+      </div>
+    </section>
+  );
+};
 
-export default HeroSection
+export default HeroSection;

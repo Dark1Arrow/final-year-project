@@ -1,59 +1,109 @@
-import React from 'react'
+import { FaFileAlt, FaSearch, FaBriefcase, FaCheck } from 'react-icons/fa';
 
-const stepsSection = () => {
-    return (
-        <div>
-            <section className="m-20">
-                <h2 className=' mb-20 text-4xl font-bold text-[#211334]'>How It Works</h2>
+const contractHistory = [
+  {
+    status: 'Contract Drafted',
+    details: 'by Jhon Doe',
+    icon: FaFileAlt,
+    iconColor: 'bg-blue-600',
+    date: '2023-10-26, 10:30 AM',
+  },
+  {
+    status: 'Sent for Legal Review',
+    details: null,
+    icon: FaFileAlt,
+    iconColor: 'bg-orange-500',
+    date: '2023-10-26, 10:30 AM',
+  },
+  {
+    status: 'Signed by All Parties',
+    details: null,
+    icon: FaSearch,
+    iconColor: 'bg-green-500',
+    date: '2023-10-26, 10:30 AM',
+  },
+  {
+    status: 'Finalized and Stored',
+    details: null,
+    icon: FaBriefcase,
+    iconColor: 'bg-purple-600',
+    date: '2023-10-26, 10:30 AM',
+  },
+  {
+    status: 'Contract Completed',
+    details: null,
+    icon: FaCheck,
+    iconColor: 'bg-teal-700',
+    date: '2023-10-26, 10:30 AM',
+  },
+];
 
-                <div className="grid md:grid-cols-2 gap-8 ml-32 mr-32">
-                    {/* Step 1 – Full width */}
-                    <div className="md:col-span-2 bg-gray-100 rounded-xl flex flex-col md:flex-row justify-between pl-20 pr-20 items-center">
-                        <img src="https://www.fittr.com/static-content/tailor_made_plans_326e72bd7f.webp" alt="Step 1" className="w-40 md:w-[500px] mb-4 md:mb-0 md:mr-6" />
-                        <div className='w-[50%]'>
-                            <h3 className="text-3xl font-bold mb-2">Step 1: Start with a Quiz</h3>
-                            <p className="text-[#404040] text-lg font-semibold">
-                                We ask simple questions about your lifestyle, body, and fitness goals. Our plans are made for your individual needs.
-                            </p>
-                        </div>
-                    </div>
+const statusKey = [
+    { label: 'Drafted', color: 'bg-blue-600' },
+    { label: 'Under Review', color: 'bg-orange-500' },
+    { label: 'Finalized', color: 'bg-purple-600' },
+    { label: 'Completed', color: 'bg-teal-700' },
+];
 
-                    {/* Step 2 */}
-                    <div className=" text-center bg-gray-100 rounded-xl flex flex-col-reverse justify-between p-20 items-center">
-                        <img src="https://www.fittr.com/static-content/sustainable_habits_124af7fc55.webp" alt="Step 2" className="w-40 md:w-[500px] mb-4 md:mb-0 md:mr-6" />
-                        <div>
-                            <h3 className="text-3xl font-bold mb-2">Step 2: Personalized Plan is Generated</h3>
-                            <p className="text-[#404040] text-lg font-semibold">
-                                Get your unique workout + diet plan based on your answers — no guesswork.
-                            </p>
-                        </div>
-                    </div>
 
-                    {/* Step 3 */}
-                    <div className="text-center bg-gray-100 rounded-xl flex flex-col-reverse justify-between p-20 items-center">
-                        <img src="https://www.fittr.com/static-content/sustainable_habits_124af7fc55.webp" alt="Step 3" className="w-[500px]md:w-56 mb-4 md:mb-0 md:mr-6" />
-                        <div>
-                            <h3 className="text-3xl font-bold mb-2">Step 3: Track Daily Habits</h3>
-                            <p className="text-[#404040] text-lg font-semibold">
-                                Log your water, sleep, steps and stay on track every day with reminders.
-                            </p>
-                        </div>
-                    </div>
+const ContactHistory = () => {
+  return (
+    <section className="py-12 px-4 md:px-6 lg:px-8 bg-gray-50">
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">
+          Contact History
+        </h2>
 
-                    {/* Step 4 – Full width */}
-                    <div className="md:col-span-2 bg-gray-100 rounded-xl flex flex-col md:flex-row-reverse justify-between pl-20 pr-20 items-center">
-                        <img src="https://www.fittr.com/static-content/tailor_made_plans_326e72bd7f.webp" alt="Step 1" className="w-40 md:w-[500px] mb-4 md:mb-0 md:mr-6" />
-                        <div className='w-[50%]'>
-                            <h3 className="text-3xl font-bold mb-2">Step 4: See Your Progress </h3>
-                            <p className="text-[#404040] text-lg font-semibold">We ask simple questions about your lifestyle, body, and fitness goals.their nutrition and training plans won’t work for you either. Our plans are made for your individual needs.
-                            </p>
-                        </div>
-                    </div>
+        <div className="flex flex-col md:flex-row md:space-x-12">
+          
+          <div className="mb-8 md:mb-0 md:w-1/3">
+            <div className="space-y-4">
+              {statusKey.map((item, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <div className={`h-3 w-3 rounded-full ${item.color}`}></div>
+                  <span className="text-gray-700 font-medium">{item.label}</span>
                 </div>
-            </section>
+              ))}
+            </div>
+          </div>
 
+          <div className="md:w-2/3">
+            <div className="relative">
+              <div className="absolute left-3.5 md:left-5 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+
+              {contractHistory.map((item, index) => (
+                <div key={index} className="mb-8 flex items-start">
+                  
+                  <div 
+                    className={`relative z-10 flex items-center justify-center 
+                                h-8 w-8 md:h-10 md:w-10 rounded-full text-white 
+                                flex-shrink-0 ${item.iconColor} shadow-md`}
+                  >
+                    <item.icon className="h-4 w-4 md:h-5 md:w-5" />
+                  </div>
+
+                  <div className="ml-6 flex-grow pt-1">
+                    <p className="text-lg font-semibold text-gray-900 leading-tight">
+                      {item.status} 
+                      {item.details && (
+                          <span className="font-normal text-gray-700 ml-1">
+                            {item.details}
+                          </span>
+                      )}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {item.date}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-    )
-}
+      </div>
+    </section>
+  );
+};
 
-export default stepsSection
+export default ContactHistory;

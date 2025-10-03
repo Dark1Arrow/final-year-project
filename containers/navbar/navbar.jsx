@@ -11,11 +11,10 @@ const links = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const bgColor = 'bg-black/80'; 
-  const textColor = 'text-white';
+ const textColor = 'text-white';
 
   return (
-    <nav className={`absolute top-0 left-0 right-0 z-50 ${bgColor} backdrop-blur-sm shadow-md`}>
+    <nav className={`absolute top-0 left-0 right-0 z-50 border-b-2 border-b-[#ffffff2d] backdrop-blur-sm`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 

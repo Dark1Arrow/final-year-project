@@ -59,7 +59,7 @@ const SignUpCard = () => {
 
         <div className="mt-6 text-sm text-gray-600">
           You already have Account ? Then just
-          <a href="#" className="text-blue-600 hover:text-blue-800 font-medium ml-1">
+          <a href="/login" className="text-blue-600 hover:text-blue-800 font-medium ml-1">
             Log in
           </a>
         </div>

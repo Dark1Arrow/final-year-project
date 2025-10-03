@@ -1,15 +1,30 @@
+"use client"
 import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { authData } from '@/constants/auth/data';
 
 const HeroSection = () => {
+
+  const router = useRouter();
+
+  const handleStart = () => {
+    if (!authData.isLoggedIn) {
+      router.push("/login");
+    } else {
+      if (authData.role === "admin") router.push("/admin/home");
+      if (authData.role === "landlord") router.push("/landlord/home");
+      if (authData.role === "tenant") router.push("/tenant/home");
+    }
+  };
 
   return (
     <section className="relative w-full h-[600px] md:h-[700px] bg-gray-600 overflow-hidden">
 
-      <div 
-        className="absolute inset-0 bg-cover bg-center" 
-        style={{ 
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
           backgroundImage: `url("/sunset-pool.png")`,
-          backgroundColor: '#9ca3af' 
+          backgroundColor: '#9ca3af'
         }}
       >
       </div>
@@ -29,11 +44,14 @@ const HeroSection = () => {
             Connect directly with landlords and tenants using smart contracts for a seamless experience.
           </p>
 
-          <button className="flex items-center space-x-2 px-10 py-3 bg-white text-gray-800 font-semibold text-lg rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+          <button
+            onClick={handleStart}
+            className="flex items-center space-x-2 px-10 py-3 bg-white text-gray-800 font-semibold text-lg rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105"
+          >
             <span>Start Now</span>
             <ArrowRight className="h-5 w-5 ml-1" />
           </button>
-          
+
         </div>
       </div>
     </section>

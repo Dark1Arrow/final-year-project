@@ -1,85 +1,59 @@
-"use client"
-import React, { useState } from 'react';
-import { FaStar, FaRegStar } from 'react-icons/fa';
+"use client";
+import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../../app/api/constants";
+import axios from "axios";
 
-const StarRating = ({ rating }) => {
-  const maxRating = 5;
-  let stars = [];
+const LandlordTable = () => {
+  const [landlordData, setLandlordData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  for (let i = 1; i <= maxRating; i++) {
-    stars.push(
-      i <= rating ? (
-        <FaStar key={i} className="text-yellow-400" />
-      ) : (
-        <FaRegStar key={i} className="text-gray-300" />
-      )
-    );
-  }
-
-  return <div className="flex space-x-0.5">{stars}</div>;
-};
-
-const FeedbackTable = () => {
-  const [feedbackData] = useState([
-    {
-      userId: '1001',
-      role: 'Landlord',
-      property: 'Tenant #22',
-      rating: 4,
-      comment: '"Late rent payment"',
-      date: '27 Sep 2025',
-    },
-    {
-      userId: '1001',
-      role: 'Tenant',
-      property: 'Flat #21',
-      rating: 5,
-      comment: '"Clean and well maintained"',
-      date: '27 Sep 2025',
-    },
-    {
-      userId: '1001',
-      role: 'Landlord',
-      property: 'Tenant #22',
-      rating: 4,
-      comment: '"Late rent payment"',
-      date: '27 Sep 2025',
-    },
-    {
-      userId: '1001',
-      role: 'Landlord',
-      property: 'Tenant #22',
-      rating: 4,
-      comment: '"Late rent payment"',
-      date: '27 Sep 2025',
-    },
-    {
-      userId: '1001',
-      role: 'Landlord',
-      property: 'Tenant #22',
-      rating: 5,
-      comment: '"Late rent payment"',
-      date: '27 Sep 2025',
-    },
-    {
-      userId: '1001',
-      role: 'Landlord',
-      property: 'Tenant #22',
-      rating: 1,
-      comment: '"Late rent payment"',
-      date: '27 Sep 2025',
-    },
-  ]);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const handleSearch = () => {
-    console.log('Searching for:', searchTerm);
+  // Fetch all landlords
+  const fetchLandlords = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/v1/users/landlord`, {
+        withCredentials: true,
+      }); // 👈 your backend should return all landlords
+      setLandlordData(res.data.data);
+    } catch (error) {
+      console.error("Error fetching landlords:", error);
+    }
   };
+
+  // Change landlord status (active/inactive)
+  const handleStatusChange = async (id, currentStatus) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+
+    try {
+      const res = await axios.put(
+        `${API_BASE_URL}/api/v1/users/landlord/${id}/status`,
+        { status: newStatus },
+        { withCredentials: true }
+      );
+
+      setLandlordData((prev) =>
+        prev.map((landlord) =>
+          landlord._id === id ? { ...landlord, status: newStatus } : landlord
+        )
+      );
+    } catch (error) {
+      console.error("Error updating landlord status:", error);
+    }
+  };
+
+  // Fetch on mount
+  useEffect(() => {
+    fetchLandlords();
+  }, []);
+
+  // Filter by ID or username
+  const filteredData = landlordData.filter(
+    (landlord) =>
+      landlord._id.includes(searchTerm) ||
+      landlord.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
-
       <div className="max-w-4xl mx-auto flex justify-end mb-6 space-x-2">
         <input
           type="text"
@@ -88,60 +62,64 @@ const FeedbackTable = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-700"
         />
-        <button
-          onClick={handleSearch}
-          className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-150 shadow-md"
-        >
-          Search
-        </button>
       </div>
 
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-           
             <thead className="bg-white">
               <tr>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  User ID
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Landlord ID
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  Role
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Name
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  Property
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Mobile
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  Rating
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Address
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  Comment
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Email
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  Date
+                <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                  Status
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {feedbackData.map((item, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {item.userId}
+              {filteredData.map((item) => (
+                <tr key={item._id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {item._id}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                    {item.role}
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {item.username}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                    {item.property}
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {item.phone}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm">
-                    <StarRating rating={item.rating} />
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {item.address}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 italic">
-                    {item.comment}
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {item.email}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                    {item.date}
+                  <td className="px-4 py-3 text-sm">
+                    <button
+                      onClick={() =>
+                        handleStatusChange(item._id, item.status)
+                      }
+                      className={` capitalize px-4 py-1 rounded-full text-xs font-semibold ${
+                        item.status === "active"
+                          ? "bg-green-500 text-white hover:bg-green-600"
+                          : "bg-orange-500 text-white hover:bg-orange-600"
+                      }`}
+                    >
+                      {item.status}
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -153,4 +131,4 @@ const FeedbackTable = () => {
   );
 };
 
-export default FeedbackTable;
+export default LandlordTable;

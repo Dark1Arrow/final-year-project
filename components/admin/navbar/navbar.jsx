@@ -1,5 +1,7 @@
 "use client"
 import React, { useState } from 'react';
+import axios from 'axios';
+import { API_BASE_URL } from '@/app/api/constants';
 
 const LogoutIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out">
@@ -27,17 +29,37 @@ const XIcon = (props) => (
 
 const Navbar = () => {
   const [activeLink, setActiveLink] = useState('Dashboard');
-  const [isOpen, setIsOpen] = useState(false); 
+  const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: 'Dashboard', href: '/admin/dashboard' }, 
+    { name: 'Dashboard', href: '/admin/dashboard' },
     { name: 'Manage Landlord', href: '/admin/manageLandlord' },
     { name: 'Manage Tenants', href: '/admin/manageTenants' },
     { name: 'Feedback', href: '/admin/feedback' },
   ];
 
-  const handleLogout = () => {
-    console.log('Logging out...');
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out...");
+
+      await axios.post(
+        `${API_BASE_URL}/api/v1/users/logout`,
+        {},
+        {
+          withCredentials: true, // important for clearing cookies/session
+        }
+      );
+
+      // clear local storage or session data if you store tokens
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      alert("Logout successful!");
+      window.location.href = "/login"; // redirect to login page
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert(error.response?.data?.message || "Logout failed!");
+    }
   };
 
   const NavLinks = ({ isMobile = false }) => (
@@ -45,20 +67,19 @@ const Navbar = () => {
       ${isMobile ? 'flex flex-col space-y-2 mt-4' : 'hidden md:flex space-x-2 sm:space-x-4 md:space-x-8 items-center flex-grow'}
     `}>
       {navItems.map((item) => (
-        <a 
-          key={item.name} 
-          href={item.href} 
-          onClick={() => { setActiveLink(item.name); if (isMobile) setIsOpen(false); }} 
+        <a
+          key={item.name}
+          href={item.href}
+          onClick={() => { setActiveLink(item.name); if (isMobile) setIsOpen(false); }}
           className="w-full"
         >
           <button
             className={`
               px-4 py-2 w-full text-left rounded-lg transition duration-200 ease-in-out
               text-sm md:text-base font-semibold whitespace-nowrap
-              ${
-                activeLink === item.name
-                  ? 'bg-teal-500 text-white shadow-md' 
-                  : 'text-gray-300 hover:text-white hover:bg-gray-700' 
+              ${activeLink === item.name
+                ? 'bg-teal-500 text-white shadow-md'
+                : 'text-gray-300 hover:text-white hover:bg-gray-700'
               }
             `}
           >
@@ -74,17 +95,17 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
 
         <div className="flex items-center">
-            <div className="text-3xl font-bold text-white tracking-wider mr-10">
-                Logo
-            </div>
-            
-            <button 
-                className="md:hidden text-white ml-4 p-2 focus:outline-none" 
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label="Toggle menu"
-            >
-                {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-            </button>
+          <div className="text-3xl font-bold text-white tracking-wider mr-10">
+            Logo
+          </div>
+
+          <button
+            className="md:hidden text-white ml-4 p-2 focus:outline-none"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </button>
         </div>
 
 
@@ -101,7 +122,7 @@ const Navbar = () => {
           <span className="hidden sm:inline">Logout</span>
         </button>
       </div>
-      <div 
+      <div
         className={`
           md:hidden transition-all duration-300 ease-in-out overflow-hidden
           ${isOpen ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}

@@ -14,7 +14,7 @@ const propertyScheam = new Schema({
     type: {
         type: String,
         required: true,
-        enum: ['apartment', 'house', 'car', 'other'],
+        enum: ['apartment', 'house', 'flat', 'other'],
     },
     address: {
         type: String,
@@ -40,6 +40,11 @@ const propertyScheam = new Schema({
         type: Boolean,
         default: true,
     },
+    status: {
+        type: String,
+        enum: ["Available", "Rented"],
+        default: "Available", // default status
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
@@ -59,6 +64,12 @@ const propertyScheam = new Schema({
         type: String,
         default: '',
     },
+    interestedUsers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user',
+        },
+    ],
 }, { timeStamp: true })
 
-export const Property = mongoose.model("property" , propertyScheam)
+export const Property = mongoose.model("property", propertyScheam)

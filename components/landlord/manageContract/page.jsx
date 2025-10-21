@@ -1,377 +1,357 @@
-"use client"
-import React, { useState } from 'react';
-import { Eye, Pencil, Zap, FileText, Calendar, Plus, X } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  Zap,
+  FileText,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Phone,
+  MapPin,
+  Home,
+  DollarSign,
+} from "lucide-react";
+import { API_BASE_URL } from "@/app/api/constants";
+// change if your backend is hosted
 
-const initialContracts = [
-  { id: 1001, property: 'Villa #7', tenant: 'Jhon', startDate: '01 Sep 25', endDate: '01 Sep 26', status: 'Active' },
-  { id: 1002, property: 'Villa #7', tenant: 'Nana', startDate: '01 Sep 25', endDate: '01 Sep 25', status: 'Pending' },
-  { id: 1003, property: 'Apt 201', tenant: 'Alice', startDate: '15 Oct 25', endDate: '15 Oct 26', status: 'Active' },
-  { id: 1004, property: 'Studio D', tenant: 'Bob', startDate: '01 Jan 26', endDate: '01 Jan 27', status: 'Expired' },
-];
+// ---------------------- COMPONENTS ----------------------
 
-const ActionButton = ({ icon: Icon, label, onClick, color }) => (
-  <button
-    onClick={onClick}
-    aria-label={label}
-    className={`p-2 rounded-full transition-colors duration-200 ${
-      color === 'blue' ? 'text-blue-600 hover:bg-blue-100' :
-      color === 'green' ? 'text-green-600 hover:bg-green-100' :
-      'text-gray-600 hover:bg-gray-100'
-    }`}
-  >
-    <Icon className="w-5 h-5" />
-  </button>
+// Contract Detail Row
+const ContractDetailRow = ({ property, tenants, colSpan }) => (
+  <tr className="bg-blue-50/50 border-t border-blue-200 animate-fade-in-down">
+    <td colSpan={colSpan} className="px-6 py-4 text-sm text-gray-700">
+      <div className="p-4 bg-white rounded-lg shadow-inner border border-blue-100">
+        <h4 className="font-bold text-blue-700 mb-3 border-b pb-1">
+          Property Details for PId: {property._id}
+        </h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="flex items-start">
+            <Home className="w-4 h-4 mr-2 mt-0.5 text-gray-500 flex-shrink-0" />
+            <div>
+              <span className="font-medium text-gray-600 block">
+                Property Type:
+              </span>
+              <span className="text-gray-900">{property.type}</span>
+            </div>
+          </div>
+
+          <div className="flex items-start">
+            <MapPin className="w-4 h-4 mr-2 mt-0.5 text-gray-500 flex-shrink-0" />
+            <div>
+              <span className="font-medium text-gray-600 block">
+                Full Location:
+              </span>
+              <span className="text-gray-900">{property.location}</span>
+            </div>
+          </div>
+
+          <div className="flex items-start">
+            <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500 flex-shrink-0" />
+            <div>
+              <span className="font-medium text-gray-600 block">
+                Monthly Rent:
+              </span>
+              <span className="text-gray-900">₹{property.rent}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <h5 className="font-semibold text-gray-700 mb-2">
+            Interested Tenants:
+          </h5>
+          {tenants.length === 0 ? (
+            <p className="text-gray-500">No tenants have shown interest yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {tenants.map((t) => (
+                <li
+                  key={t._id}
+                  className="p-2 border rounded-md flex justify-between items-center bg-gray-50"
+                >
+                  <span className="text-gray-800">
+                    {t.fullname} ({t.email})
+                  </span>
+                  <span className="text-sm text-gray-500">{t.phone}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </td>
+  </tr>
 );
 
-const getStatusBadge = (status) => {
-  let colorClass = '';
-  switch (status) {
-    case 'Active':
-      colorClass = 'bg-green-100 text-green-800';
-      break;
-    case 'Pending':
-      colorClass = 'bg-orange-100 text-orange-800';
-      break;
-    case 'Expired':
-      colorClass = 'bg-red-100 text-red-800';
-      break;
-    default:
-      colorClass = 'bg-gray-100 text-gray-800';
-  }
-  return (
-    <span
-      className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${colorClass}`}
-    >
-      {status}
-    </span>
-  );
-};
+// Modal for creating contract
+const CreateContractModal = ({ tenant, property, onClose, onCreate }) => {
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
-const MobileContractCard = ({ contract, handleView, handleEdit }) => {
-  const isEditable = contract.status === 'Pending'; 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/api/v1/booking/create`,
+        {
+          user: tenant._id, // user = tenant ID
+          propertyId: property._id,
+          startDate,
+          endDate,
+        },
+        { withCredentials: true }
+      );
 
-  return (
-    <div className="bg-white p-4 mb-4 rounded-xl shadow-lg border border-gray-100 md:hidden">
-      <div className="flex items-center justify-between border-b pb-2 mb-2">
-        <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-          <FileText className="w-5 h-5 mr-2 text-blue-500" />
-          Contract ID: {contract.id}
-        </h3>
-        {getStatusBadge(contract.status)}
-      </div>
-
-      <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
-        <div className="flex items-center col-span-2">
-          <span className="font-medium w-1/4">Tenant:</span>
-          <span className="text-gray-900 font-medium">{contract.tenant}</span>
-        </div>
-        <div className="flex items-center col-span-2">
-          <span className="font-medium w-1/4">Property:</span>
-          <span className="ml-1 text-gray-900 truncate">{contract.property}</span>
-        </div>
-        <div className="flex items-center">
-          <Calendar className="w-4 h-4 mr-1 text-purple-400" />
-          <span className="font-medium">Start:</span>
-          <span className="ml-1 text-gray-900">{contract.startDate}</span>
-        </div>
-        <div className="flex items-center">
-          <Calendar className="w-4 h-4 mr-1 text-red-400" />
-          <span className="font-medium">End:</span>
-          <span className="ml-1 text-gray-900">{contract.endDate}</span>
-        </div>
-      </div>
-
-      <div className="flex justify-end pt-3 mt-3 border-t">
-        {isEditable ? (
-          <ActionButton icon={Pencil} label="Edit Contract" onClick={() => handleEdit(contract.id)} color="green" />
-        ) : (
-          <ActionButton icon={Eye} label="View Contract" onClick={() => handleView(contract.id)} color="blue" />
-        )}
-      </div>
-    </div>
-  );
-};
-
-const CreateContractForm = ({ onClose, onCreate }) => {
-    const [formData, setFormData] = useState({
-        property: 'Acme-Apartment 016',
-        tenant: 'Jhon doe',
-        contractId: 'CN-39893',
-        startDate: '2025-10-01',
-        endDate: '2026-09-30',
-        rent: '500$'
-    });
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onCreate(formData);
-    };
-    
-    const properties = ['Acme-Apartment 016', 'Villa #7', 'Studio D', 'Apt 201'];
-    const tenants = ['Jhon doe', 'Nana Smith', 'Alice Johnson', 'Bob Williams'];
-
-
-    const SectionCard = ({ title, children }) => (
-        <div className="bg-white p-6 rounded-xl shadow-lg mb-6 border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">{title}</h2>
-            {children}
-        </div>
-    );
-
-    return (
-        <div className="max-w-4xl mx-auto mt-8 p-4 sm:p-6 lg:p-8 bg-white/70 backdrop-blur-sm rounded-xl shadow-2xl">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h1 className="text-3xl font-extrabold text-gray-900">Create New Lease Contract</h1>
-                <button
-                    onClick={onClose}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-full transition-colors hover:bg-gray-100"
-                    aria-label="Close form"
-                >
-                    <X className="w-7 h-7" />
-                </button>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-               
-                <SectionCard title="1. Property & Tenants">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                       
-                        <div className="flex flex-col">
-                            <label htmlFor="property" className="text-sm font-medium text-gray-700 sr-only">Property</label>
-                            <select
-                                id="property"
-                                name="property"
-                                value={formData.property}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 appearance-none text-gray-800"
-                            >
-                                {properties.map(p => <option key={p} value={p}>{p}</option>)}
-                            </select>
-                        </div>
-                        
-                        <div className="flex flex-col">
-                            <label htmlFor="tenant" className="text-sm font-medium text-gray-700 sr-only">Tenant</label>
-                            <select
-                                id="tenant"
-                                name="tenant"
-                                value={formData.tenant}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 appearance-none text-gray-800"
-                            >
-                                {tenants.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="w-full md:w-1/2">
-                        <label htmlFor="contractId" className="block text-sm font-medium text-gray-700 mb-2">Contract ID</label>
-                        <input
-                            id="contractId"
-                            name="contractId"
-                            type="text"
-                            value={formData.contractId}
-                            onChange={handleChange}
-                            readOnly 
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-gray-50 text-gray-600 cursor-not-allowed"
-                        />
-                    </div>
-                </SectionCard>
-
-                <SectionCard title="2. Contact Dates & Rent Details">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        <div className="flex flex-col">
-                            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">Starting Date</label>
-                            <div className="relative">
-                                <input
-                                    id="startDate"
-                                    name="startDate"
-                                    type="date"
-                                    value={formData.startDate}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-800 appearance-none"
-                                />
-                                <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col">
-                            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">Ending Date</label>
-                            <div className="relative">
-                                <input
-                                    id="endDate"
-                                    name="endDate"
-                                    type="date"
-                                    value={formData.endDate}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-800 appearance-none"
-                                />
-                                <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col mt-4 md:col-span-2">
-                            <label htmlFor="rent" className="block text-sm font-medium text-gray-700 mb-2">Monthly Rent Amount</label>
-                            <input
-                                id="rent"
-                                name="rent"
-                                type="text"
-                                value={formData.rent}
-                                onChange={handleChange}
-                                required
-                                className="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-800"
-                            />
-                        </div>
-                    </div>
-                </SectionCard>
-                
-                <div className="flex justify-center space-x-4 pt-4">
-                    <button
-                        type="submit"
-                        className="flex items-center px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
-                    >
-                        Create Contract
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="flex items-center px-8 py-3 text-lg font-semibold text-gray-700 bg-gray-200 rounded-full shadow-md hover:bg-gray-300 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-gray-300"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
-};
-
-const App = () => {
-  const [contracts, setContracts] = useState(initialContracts);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const handleView = (id) => {
-    console.log(`Viewing contract ID: ${id}`);
-  };
-
-  const handleEdit = (id) => {
-    console.log(`Editing contract ID: ${id}`);
-  };
-  
-  const handleCreateContract = (newContractData) => {
-    console.log("Creating new contract:", newContractData);
-    const newId = contracts.length > 0 ? Math.max(...contracts.map(c => c.id)) + 1 : 1001;
-    const newContract = {
-        id: newId,
-        property: newContractData.property,
-        tenant: newContractData.tenant,
-        startDate: newContractData.startDate.replace(/-/g, '/'), 
-        endDate: newContractData.endDate.replace(/-/g, '/'),
-        status: 'Pending'
-    };
-    setContracts(prev => [newContract, ...prev]);
-    setIsFormOpen(false);
+      const data = res.data.data;
+      onCreate(data);
+      alert("Booking created successfully!");
+      onClose();
+    } catch (err) {
+      console.error("Booking creation error:", err);
+      alert(err.response?.data?.message || "Error creating booking");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-['Inter']">
-      <div className="max-w-7xl mx-auto">
-        
-        <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 flex items-center">
-              <Zap className="w-7 h-7 mr-3 text-blue-500" />
-              Manage Property Contract
-            </h1>
-            <button
-                onClick={() => setIsFormOpen(true)}
-                className="flex items-center px-4 py-2 text-white bg-green-600 rounded-full shadow-lg hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium text-base"
-            >
-                <Plus className="w-5 h-5 mr-2" />
-                New Contract
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in-down">
+      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full">
+        <div className="p-6">
+          <div className="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Create Booking
+            </h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <X className="w-6 h-6" />
             </button>
-        </div>
+          </div>
 
-        {isFormOpen ? (
-            <CreateContractForm 
-                onClose={() => setIsFormOpen(false)}
-                onCreate={handleCreateContract}
-            />
-        ) : (
-          <>
-            <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow-2xl">
-              <table className="min-w-full divide-y divide-gray-200">
-            
-                <thead className="bg-gray-50">
-                  <tr>
-                    {['Contract ID', 'Property', 'Tenant', 'Start Date', 'End Date', 'Status', 'Contract'].map((header) => (
-                      <th
-                        key={header}
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {contracts.map((contract) => (
-                    <tr key={contract.id} className="hover:bg-blue-50 transition-colors duration-150">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {contract.id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {contract.property}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {contract.tenant}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {contract.startDate}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {contract.endDate}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {getStatusBadge(contract.status)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-1">
-                          {contract.status === 'Pending' ? (
-                            <ActionButton icon={Pencil} label="Edit Contract" onClick={() => handleEdit(contract.id)} color="green" />
-                          ) : (
-                            <ActionButton icon={Eye} label="View Contract" onClick={() => handleView(contract.id)} color="blue" />
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-y-3 text-sm">
+              <span className="font-medium text-gray-600">Tenant :</span>
+              <span className="font-bold text-gray-900">{tenant.fullname}</span>
+
+              <span className="font-medium text-gray-600">Phone :</span>
+              <span className="font-bold text-gray-900">{tenant.phone}</span>
+
+              <span className="font-medium text-gray-600">Property :</span>
+              <span className="text-gray-900">{property.city}</span>
+
+              <span className="font-medium text-gray-600">Rent :</span>
+              <span className="text-gray-900">₹{property.rentPrice}</span>
             </div>
 
-            <div className="md:hidden space-y-4">
-              {contracts.map((contract) => (
-                <MobileContractCard
-                  key={contract.id}
-                  contract={contract}
-                  handleView={handleView}
-                  handleEdit={handleEdit}
+            <div className="space-y-4 pt-4 border-t mt-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500"
                 />
-              ))}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500"
+                />
+              </div>
             </div>
-          </>
-        )}
+
+            <div className="flex justify-center pt-2">
+              <button
+                type="submit"
+                className="flex items-center px-6 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors font-semibold"
+              >
+                <FileText className="w-5 h-5 mr-2" /> Create
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
+// ---------------------- MAIN COMPONENT ----------------------
+const App = () => {
+  const [landlordId] = useState("L001"); // Replace with actual logged-in landlord ID
+  const [properties, setProperties] = useState([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+  const [tenantsMap, setTenantsMap] = useState({});
+  const [selectedTenants, setSelectedTenants] = useState({}); // 👈 store selected tenant per property
+  const [createModal, setCreateModal] = useState(null); // { tenant, property }
+
+  // ✅ Fetch landlord properties
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/v1/property/ownerProperty`, {
+          withCredentials: true,
+        });
+        const data = res.data.data;
+        console.log("Properties:", data);
+        setProperties(data || []);
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+      }
+    };
+    fetchProperties();
+  }, [landlordId]);
+
+  // ✅ Fetch tenants for a selected property
+  const handleViewDetails = async (propertyId) => {
+    setSelectedPropertyId((prev) => (prev === propertyId ? null : propertyId));
+
+    if (!tenantsMap[propertyId]) {
+      try {
+        const property = properties.find((p) => p._id === propertyId);
+        if (!property || !property.interestedUsers?.length) {
+          console.warn("No interested users found for this property");
+          return;
+        }
+
+        const tenants = await Promise.all(
+          property.interestedUsers.map(async (tId) => {
+            const res = await axios.get(`${API_BASE_URL}/api/v1/users/${tId}`, {
+              withCredentials: true,
+            });
+            return res.data.data;
+          })
+        );
+
+        console.log("Fetched tenants for", propertyId, tenants);
+        setTenantsMap((prev) => ({ ...prev, [propertyId]: tenants }));
+      } catch (err) {
+        console.error("Error fetching tenants:", err);
+      }
+    }
+  };
+
+  // ✅ Handle tenant selection for a property
+  const handleTenantSelect = (propertyId, tenantId) => {
+    setSelectedTenants((prev) => ({ ...prev, [propertyId]: tenantId }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6 font-['Inter']">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-center items-center mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900 flex items-center">
+            <Zap className="w-7 h-7 mr-3 text-blue-500" />
+            Manage Property Contract
+          </h1>
+        </div>
+
+        <div className="overflow-x-auto bg-white rounded-xl shadow-2xl border border-gray-200">
+          <table className="min-w-full">
+            <thead className="bg-gray-800">
+              <tr>
+                <th></th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">Property ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">Location</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">Rent</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">Tenant</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody className="bg-white divide-y divide-gray-200">
+              {properties.map((property) => (
+                <React.Fragment key={property._id}>
+                  <tr className="hover:bg-blue-50 transition-colors duration-150">
+                    <td className="px-3 py-4">
+                      <button
+                        onClick={() => handleViewDetails(property._id)}
+                        className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-semibold"
+                      >
+                        {selectedPropertyId === property._id ? "Hide" : "Property Details"}
+                      </button>
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-900">{property._id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{property.type}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{property.city}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">₹{property.rentPrice}</td>
+
+                    {/* 👇 Tenant Selector */}
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {tenantsMap[property._id] && tenantsMap[property._id].length > 0 ? (
+                        <select
+                          className="border rounded-lg px-2 py-1 text-sm focus:outline-none"
+                          value={selectedTenants[property._id] || ""}
+                          onChange={(e) => handleTenantSelect(property._id, e.target.value)}
+                        >
+                          <option value="">Select Tenant</option>
+                          {tenantsMap[property._id].map((tenant) => (
+                            <option key={tenant._id} value={tenant._id}>
+                              {tenant.fullname}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-gray-400 text-sm">No tenants</span>
+                      )}
+                    </td>
+
+                    <td className="px-3 py-4 text-sm font-medium">
+                      <button
+                        disabled={!selectedTenants[property._id]}
+                        onClick={() => {
+                          const selectedTenant = tenantsMap[property._id]?.find(
+                            (t) => t._id === selectedTenants[property._id]
+                          );
+                          if (selectedTenant)
+                            setCreateModal({ property, tenant: selectedTenant });
+                        }}
+                        className={`px-3 py-2 rounded-lg text-xs font-semibold text-white ${
+                          selectedTenants[property._id]
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-gray-300 cursor-not-allowed"
+                        }`}
+                      >
+                        Create Contract
+                      </button>
+                    </td>
+                  </tr>
+
+                  {selectedPropertyId === property._id && (
+                    <ContractDetailRow
+                      property={property}
+                      tenants={tenantsMap[property._id] || []}
+                      colSpan={7}
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 👇 Contract Creation Modal */}
+      {createModal && (
+        <CreateContractModal
+          tenant={createModal.tenant}
+          property={createModal.property}
+          onClose={() => setCreateModal(null)}
+          onCreate={() => setCreateModal(null)}
+        />
+      )}
+    </div>
+  );
+};
+
 
 export default App;

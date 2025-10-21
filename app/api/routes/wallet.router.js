@@ -1,11 +1,13 @@
 import {Router} from "express"
-import { createWallet, getWalletBalance, getWalletByUser } from "../controllers/wallet.controller.js";
+import { createWallet, getAllWallets, getWalletBalance, getWalletByUser } from "../controllers/wallet.controller.js";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 
 const router = Router()
 
 //creatwallet / wallet / balance
 router.route("/create").post(createWallet)
-router.route("/all/:userId").get(getWalletByUser)
-router.route("/get/:wallet").get(getWalletBalance)
+router.route("/user/:userId").get(getWalletByUser)
+router.route("/balance/:walletId").get(getWalletBalance)
+router.route("/all").get(verifyJWT,getAllWallets)
 
 export default router

@@ -2,24 +2,70 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authDataLogin } from "@/constants/auth/data";
+import axios from "axios";
+import { API_BASE_URL } from "../../app/api/constants";
 
 const LogInCard = () => {
-  const [role, setRole] = useState("admin");
+  const [role, setRole] = useState("tenant");
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("goutam910@example.com"); // new email field
+  const [password, setPassword] = useState("StrongPass123!");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    authDataLogin.isLoggedIn = true;
-    authDataLogin.role = role;
-    authDataLogin.username = username;
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/v1/users/login`, {
+        username,
+        email,
+        password,
+        role,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      console.log(response.data, "hey");
 
-    if (role === "admin") router.push("/admin/dashboard");
-    if (role === "landlord") router.push("/landlord/home");
-    if (role === "tenant") router.push("/tenant/home");
+      const user = response.data?.data?.user; // safe access
+      if (!user) {
+        alert("Login failed: Invalid response from server", user);
+        return;
+      }
+
+      // save to auth data
+      // authDataLogin.isLoggedIn = true;
+      // authDataLogin.role = user?.role;
+      // authDataLogin.username = user?.username;
+
+      // route based on role
+      if (user.role === "admin") router.push("/admin/dashboard");
+      if (user.role === "landlord") router.push("/landlord/home");
+      if (user.role === "tenant") router.push("/tenant/home");
+
+    } catch (error) {
+      console.error("Login error:", error);
+
+      const status = error.response?.status;
+      const message =
+        (error.response?.data?.message) || error.message || "Something went wrong!";
+
+      if (status === 400) {
+        alert("Bad Request: " + message);
+      } else if (status === 401) {
+        alert("Unauthorized: Invalid username or password.");
+      }else if (status === 422) {
+        alert("Dont approve yet");
+      } else if (status === 404) {
+        alert("User not found. Please sign up first.");
+      } else {
+        alert("Login failed: " + message);
+      }
+    }
   };
 
   return (
@@ -35,11 +81,10 @@ const LogInCard = () => {
               <div
                 key={r}
                 onClick={() => setRole(r)}
-                className={`pb-3 px-4 cursor-pointer ${
-                  role === r
-                    ? "font-semibold text-gray-800 border-b-2 border-blue-600"
-                    : "font-medium text-gray-500 hover:text-gray-700"
-                }`}
+                className={`pb-3 px-4 cursor-pointer ${role === r
+                  ? "font-semibold text-gray-800 border-b-2 border-blue-600"
+                  : "font-medium text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 {r.charAt(0).toUpperCase() + r.slice(1)}
               </div>
@@ -59,6 +104,17 @@ const LogInCard = () => {
               />
             </div>
 
+            <div className="mb-4">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
             <div className="mb-6">
               <input
                 type="password"
@@ -70,17 +126,20 @@ const LogInCard = () => {
               />
             </div>
 
+            {error && <p className="text-red-600 mb-3">{error}</p>}
+
             <button
               type="submit"
+              disabled={loading}
               className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 transition duration-150"
             >
-              Log in &gt;
+              {loading ? "Logging in..." : "Log in >"}
             </button>
           </form>
         </div>
 
         <div className="mt-6 text-sm text-gray-600">
-          You don&apos;t have Account?
+          You don&apos;t have an Account?
           <a
             href="/signup"
             className="text-blue-600 hover:text-blue-800 font-medium ml-1"

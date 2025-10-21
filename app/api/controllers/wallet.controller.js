@@ -46,7 +46,7 @@ const getWalletByUser = asyncHandler(async (req, res) => {
 })
 
 const getWalletBalance = asyncHandler(async (req, res) => {
-    const wallet = await Wallet.findOne(req.params.walletId)
+    const wallet = await Wallet.findById(req.params.walletId)
     if (!wallet) {
         throw new ApiError(400, "Wallwt not found")
     }
@@ -56,4 +56,44 @@ const getWalletBalance = asyncHandler(async (req, res) => {
     )
 })
 
-export { createWallet, getWalletBalance, getWalletByUser }
+const getAllWallets = asyncHandler(async (req, res) => {
+    // Check if user role is admin
+    // Assuming you have user info in req.user (from auth middleware)
+    if (req.user.role !== "admin") {
+        throw new ApiError(403, "Access denied: Admins only");
+    }
+
+    const wallets = await Wallet.find(); // fetch all wallets
+    if (!wallets || wallets.length === 0) {
+        throw new ApiError(404, "No wallets found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, wallets, "All wallets fetched successfully")
+    );
+});
+
+const topUpWallet = asyncHandler(async (req, res) => {
+  const { walletId } = req.params;
+  const { amount } = req.body;
+
+  if (!amount || amount <= 0) {
+    throw new ApiError(400, "Invalid top-up amount");
+  }
+
+  // find wallet
+  const wallet = await Wallet.findById(walletId);
+  if (!wallet) {
+    throw new ApiError(404, "Wallet not found");
+  }
+
+  // update balance
+  wallet.balance += Number(amount);
+  await wallet.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, wallet, "Wallet topped up successfully")
+  );
+});
+
+export { createWallet, getWalletBalance, getWalletByUser ,getAllWallets }

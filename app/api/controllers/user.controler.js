@@ -1,3 +1,4 @@
+import { error } from "console";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js"
@@ -27,10 +28,14 @@ const registerUser = asyncHandler(async (req, res) => {
     // check for user creation
     // return res or error res
 
-    const { password, email, username, address, phone, fullname } = req.body
+    const { password, email, username, address, phone, fullname, role } = req.body
+
+    if (role == "admin") {
+        throw new ApiError(401, "Admin registration is not allowed")
+    }
 
     if (
-        [password, email, username, address, phone, fullname].some((filds) => filds?.trim() === "")
+        [password, email, username, address, phone, fullname, role].some((filds) => filds?.trim() === "")
     ) {
         throw new ApiError(400, "All fields are Required")
     }
@@ -38,7 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const existedUser = await User.findOne({
         $or: [{ username }, { email }, { phone }]
     })
-
+    console.log(existedUser);
     if (existedUser) {
         throw new ApiError(409, "User with username or email is alrady exist")
     }
@@ -50,6 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
         address,
         phone,
         fullname,
+        role,
     })
 
     const createdUser = await User.findById(user._id).select(
@@ -67,18 +73,26 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
 
-    const { password, email, username } = req.body
+    const { password, email, username, role } = req.body
 
     if (!username || !email) {
         throw ApiError(400, "Atleast one field is required username or email");
     }
 
     const user = await User.findOne({
-        $or: [{ username }, { email }]
+        $or: [{ username }, { email }, { role }]
     })
 
     if (!user) {
         throw new ApiError(404, "User does not exist")
+    }
+
+    if (user.username != username || user.email != email || user.role != role) {
+        throw new ApiError(401, "user not enter authentic info")
+    }
+
+    if (user.status != "active") {
+        throw new ApiError(422, "user not have any access")
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password)
@@ -113,28 +127,141 @@ const loginUser = asyncHandler(async (req, res) => {
 
 })
 
-const logoutUser = asyncHandler(async (req,res)=>{
-     await User.findByIdAndUpdate(
+const logoutUser = asyncHandler(async (req, res) => {
+    await User.findByIdAndUpdate(
         req.user._id,
         {
             $set: {
                 refreshToken: undefined
             }
-        },{
-            new:true
-        }
-     )
+        }, {
+        new: true
+    }
+    )
 
     const option = {
         httpOnly: true,
         secure: true,
     }
-    
+
     return res
-    .status(200)
-    .clearCookie("accessToken",option)
-    .clearCookie("refreshToken",option)
-    .json(new ApiResponse(200,{},"user logout"))
+        .status(200)
+        .clearCookie("accessToken", option)
+        .clearCookie("refreshToken", option)
+        .json(new ApiResponse(200, {}, "user logout"))
 })
 
-export { registerUser, loginUser,logoutUser }  
+const getAllLandlord = asyncHandler(async (req, res) => {
+    // Find all users with role = "tenant"
+    const landlord = await User.find({ role: "landlord" }).select("-password -refreshToken");
+
+    if (!landlord || landlord.length === 0) {
+        throw new ApiError(404, "No landlord found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, landlord, "Landlord fetched successfully")
+    );
+});
+
+const getAllTenants = asyncHandler(async (req, res) => {
+    // Find all users with role = "tenant"
+    const tenants = await User.find({ role: "tenant" }).select("-password -refreshToken");
+
+    if (!tenants || tenants.length === 0) {
+        throw new ApiError(404, "No tenants found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, tenants, "Tenants fetched successfully")
+    );
+});
+
+const updateTenantStatus = asyncHandler(async (req, res) => {
+    const { status } = req.body; // Expected: "Approve" or "Disapprove"
+
+    // ✅ Verify that the user making the request is an admin
+    if (req.user.role !== "admin") {
+        throw new ApiError(403, "Access denied. Only admin can update tenant status");
+    }
+
+    if (!status) {
+        throw new ApiError(400, "Status is required");
+    }
+
+    const tenant = await User.findByIdAndUpdate(
+        req.params.tenatnId,
+        { status: status },
+        { new: true }
+    ).select("-password -refreshToken");
+
+    if (!tenant || tenant.role !== "tenant") {
+        throw new ApiError(404, "Tenant not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, tenant, `Tenant status updated to ${status}`)
+    );
+});
+
+const updateLandlordStatus = asyncHandler(async (req, res) => {
+    const { status } = req.body; // Expected: "Approve" or "Disapprove"
+
+    // ✅ Verify that the user making the request is an admin
+    if (req.user.role !== "admin") {
+        throw new ApiError(403, "Access denied. Only admin can update tenant status");
+    }
+
+    if (!status) {
+        throw new ApiError(400, "Status is required");
+    }
+
+    const tenant = await User.findByIdAndUpdate(
+        req.params.landlord,
+        { status: status },
+        { new: true }
+    ).select("-password -refreshToken");
+
+    if (!tenant || tenant.role !== "landlord") {
+        throw new ApiError(404, "Tenant not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, tenant, `Tenant status updated to ${status}`)
+    );
+});
+
+const getUserDetails = asyncHandler(async (req, res) => {
+    
+    if (!req.user) {
+        throw new ApiError(401, "User not authenticated");
+    }
+
+    const user = await User.findById(req.user).select("-password -refreshToken");
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, user, "User details fetched successfully")
+    );
+});
+
+const getTenantById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        throw new ApiError(400, "ID is required");
+    }
+
+    const user = await User.findById(id).select("-password -refreshToken");
+    if (!user) {
+        throw new ApiError(404, "useer not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, user, "user details fetched successfully")
+    );
+});
+
+export { registerUser, loginUser, logoutUser, getAllTenants, updateTenantStatus, getAllLandlord, updateLandlordStatus,getUserDetails, getTenantById }  

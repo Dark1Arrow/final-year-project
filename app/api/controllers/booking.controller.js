@@ -86,4 +86,27 @@ const completeBooking = asyncHandler(async (req, res) => {
     )
 })
 
-export { createBooking, getBooking, confirmeBooking, cancelBooking, completeBooking }
+const getUserBookings = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new ApiError(401, "User not authenticated");
+    }
+
+    const userId = req.user._id;
+
+    // Find all bookings for the given user
+    const bookings = await Booking.find({ user: userId })
+        .sort({ createdAt: -1 });
+
+    if (!bookings || bookings.length === 0) {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, [], "No bookings found for this user"));
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, bookings, "Bookings fetched successfully"));
+});
+
+
+export { createBooking, getBooking, confirmeBooking, cancelBooking, completeBooking, getUserBookings }

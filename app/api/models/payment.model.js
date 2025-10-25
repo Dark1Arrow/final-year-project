@@ -6,6 +6,16 @@ const paymentSchema = new Schema({
         ref: "Booking",
         required: true
     },
+    property: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Property",
+        required: true
+    },
+    landlord: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -19,7 +29,7 @@ const paymentSchema = new Schema({
         type: String,
         enum: ["card", "upi", "netbanking", "wallet", "crypto"],
         required: true,
-        default:"wallet"
+        default: "wallet"
     },
     transactionId: {
         type: String,

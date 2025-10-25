@@ -1,5 +1,7 @@
 "use client"
 import React, { useState } from 'react';
+import axios from 'axios';
+import { API_BASE_URL } from '@/app/api/constants';
 
 const LogoutIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out">
@@ -39,8 +41,28 @@ const Navbar = () => {
     { name: 'Feedback', href: '/tenant/feedback' },
   ];
 
-  const handleLogout = () => {
-    console.log('Logging out...');
+   const handleLogout = async () => {
+    try {
+      console.log("Logging out...");
+
+      await axios.post(
+        `${API_BASE_URL}/api/v1/users/logout`,
+        {},
+        {
+          withCredentials: true, // important for clearing cookies/session
+        }
+      );
+
+      // clear local storage or session data if you store tokens
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      alert("Logout successful!");
+      window.location.href = "/login"; // redirect to login page
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert(error.response?.data?.message || "Logout failed!");
+    }
   };
 
   const NavLinks = ({ isMobile = false }) => (

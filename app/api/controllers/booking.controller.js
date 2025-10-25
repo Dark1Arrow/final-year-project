@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 
 const createBooking = asyncHandler(async (req, res) => {
-    const { user, propertyId, startDate, endDate } = req.body
+    const { user,landlordId, propertyId, startDate, endDate } = req.body
 
     const property = await Property.findById(propertyId)
     if (!property) {
@@ -18,6 +18,7 @@ const createBooking = asyncHandler(async (req, res) => {
 
     const booking = await Booking.create({
         user: user,
+        landlord: landlordId,
         property: propertyId,
         startDate,
         endDate,
@@ -108,5 +109,30 @@ const getUserBookings = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, bookings, "Bookings fetched successfully"));
 });
 
+const getLandlordBookings = asyncHandler(async (req, res) => {
+    // Ensure landlord is authenticated
+    if (!req.user) {
+        throw new ApiError(401, "User not authenticated");
+    }
 
-export { createBooking, getBooking, confirmeBooking, cancelBooking, completeBooking, getUserBookings }
+    const landlordId = req.user._id;
+
+    // Find all bookings that belong to this landlord
+    const bookings = await Booking.find({ landlord: landlordId })
+        .sort({ createdAt: -1 });
+
+    // Check if there are any bookings
+    if (!bookings || bookings.length === 0) {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, [], "No bookings found for this landlord"));
+    }
+
+    // Return successful response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, bookings, "Bookings fetched successfully"));
+});
+
+
+export { createBooking, getBooking, confirmeBooking, cancelBooking, completeBooking, getUserBookings , getLandlordBookings }

@@ -93,11 +93,13 @@ const CreateContractModal = ({ tenant, property, onClose, onCreate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log(property)
       const res = await axios.post(
         `${API_BASE_URL}/api/v1/booking/create`,
         {
           user: tenant._id, // user = tenant ID
           propertyId: property._id,
+          landlordId: property.owner,
           startDate,
           endDate,
         },

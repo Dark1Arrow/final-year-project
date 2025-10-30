@@ -7,8 +7,10 @@ const app = express()
 app.use(
   cors({
     origin: [
-      "https://final-year-project-dark1arrows-projects.vercel.app" // allow any vercel deployment
-    ],
+    "https://final-year-project-dark1arrows-projects.vercel.app",
+    "https://final-year-project-git-backendconnectvity-dark1arrows-projects.vercel.app",
+    "http://localhost:3000"
+  ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })

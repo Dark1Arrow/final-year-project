@@ -6,18 +6,15 @@ const app = express()
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || origin.endsWith(".vercel.app")) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: [
+      "https://final-year-project-five-navy.vercel.app",
+      "https://final-year-project-dark1arrows-projects.vercel.app",
+      /\.vercel\.app$/, // allow any vercel deployment
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
-
 
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))

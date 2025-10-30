@@ -6,14 +6,18 @@ const app = express()
 
 app.use(
   cors({
-    origin: [
-      "https://final-year-project-qy10w4ftt-dark1arrows-projects.vercel.app", // your frontend Vercel domain
-      "http://localhost:3000", // for local development
-    ],
+    origin: (origin, callback) => {
+      if (!origin || origin.endsWith(".vercel.app")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // if you're using cookies or tokens
+    credentials: true,
   })
 );
+
 
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))

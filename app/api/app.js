@@ -6,7 +6,10 @@ const app = express()
 
 app.use(cors({
     // origin: process.env.CORS_ORIGIN,
-    origin: "http://localhost:3000",
+    origin: [
+        "https://final-year-project-qy10w4ftt-dark1arrows-projects.vercel.app", // your frontend domain
+        "http://localhost:3000" // for local testing
+    ],
     credentials: true
 }))
 

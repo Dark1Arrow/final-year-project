@@ -34,11 +34,11 @@ import notificationRouter from "./routes/notification.route.js"
 
 //routes decleration
 app.use("/v1/users", userRouter)
-app.use("/api/v1/wallet", walletRouter)
-app.use("/api/v1/property", propertyRouter)
-app.use("/api/v1/booking", bookingRouter)
-app.use("/api/v1/payment", paymentRoter)
-app.use("/api/v1/review", reviewRouter)
-app.use("/api/v1/notiifcation", notificationRouter)
+app.use("/v1/wallet", walletRouter)
+app.use("/v1/property", propertyRouter)
+app.use("/v1/booking", bookingRouter)
+app.use("/v1/payment", paymentRoter)
+app.use("/v1/review", reviewRouter)
+app.use("/v1/notiifcation", notificationRouter)
 
 export { app }

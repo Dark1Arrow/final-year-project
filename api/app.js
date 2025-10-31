@@ -24,13 +24,13 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 //routes
-import userRouter from "./routes/user.routes.js"
-import walletRouter from "./routes/wallet.router.js"
-import propertyRouter from "./routes/property.routes.js"
-import bookingRouter from "./routes/booking.router.js"
-import paymentRoter from "./routes/payment.route.js"
-import reviewRouter from "./routes/review.route.js"
-import notificationRouter from "./routes/notification.route.js"
+import userRouter from "../app/api/routes/user.routes.js"
+import walletRouter from "../app/api/routes/wallet.router.js"
+import propertyRouter from "../app/api/routes/property.routes.js"
+import bookingRouter from "../app/api/routes/booking.router.js"
+import paymentRoter from "../app/api/routes/payment.route.js"
+import reviewRouter from "../app/api/routes/review.route.js"
+import notificationRouter from "../app/api/routes/notification.route.js"
 
 //routes decleration
 app.use("/v1/users", userRouter)

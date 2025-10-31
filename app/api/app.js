@@ -33,7 +33,7 @@ import reviewRouter from "./routes/review.route.js"
 import notificationRouter from "./routes/notification.route.js"
 
 //routes decleration
-app.use("/api/v1/users", userRouter)
+app.use("/v1/users", userRouter)
 app.use("/api/v1/wallet", walletRouter)
 app.use("/api/v1/property", propertyRouter)
 app.use("/api/v1/booking", bookingRouter)

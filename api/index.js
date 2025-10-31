@@ -1,5 +1,5 @@
-import app from "../app.js";
-import ConnectDB from "../db/index.js";
+import { app } from "../app/api/app.js";   // correct path to your app.js
+import ConnectDB from "../app/api/db/index.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,6 +13,5 @@ export default async function handler(req, res) {
     console.log("✅ MongoDB Connected");
   }
 
-  // let Express handle the request
   return app(req, res);
 }

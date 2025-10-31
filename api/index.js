@@ -1,4 +1,4 @@
-import { app } from "./app.js";   // correct path to your app.js
+import { app } from "../app/api/app.js";   // correct path to your app.js
 import ConnectDB from "../app/api/db/index.js";
 import dotenv from "dotenv";
 

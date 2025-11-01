@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { API_BASE_URL } from "../../app/api/constants";
+import { API_BASE_URL } from "";
 
 const SignUpCard = () => {
   const [formData, setFormData] = useState({

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { API_BASE_URL } from "../../app/api/constants";
+import { API_BASE_URL } from "";
 
 const LogInCard = () => {
   const [role, setRole] = useState("tenant");

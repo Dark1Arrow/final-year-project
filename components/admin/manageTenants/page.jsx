@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { API_BASE_URL } from "../../../app/api/constants";
+import { API_BASE_URL } from "../";
 import axios from "axios";
 
 const TenantTable = () => {

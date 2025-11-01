@@ -134,7 +134,7 @@ const App = () => {
 
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/v1/review/get`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/get`, {
         withCredentials: true,
       });
       setReviews(res.data.data || []);
@@ -150,11 +150,11 @@ const App = () => {
   const handleSubmit = async (data) => {
     try {
       if (editData) {
-        await axios.put(`${API_BASE_URL}/api/v1/review/${editData._id}`, data, {
+        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/${editData._id}`, data, {
           withCredentials: true,
         });
       } else {
-        await axios.post(`${API_BASE_URL}/api/v1/review/create`, data, {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/create`, data, {
           withCredentials: true,
         });
       }
@@ -167,7 +167,7 @@ const App = () => {
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this feedback?")) return;
     try {
-      await axios.delete(`${API_BASE_URL}/api/v1/review/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/${id}`, {
         withCredentials: true,
       });
       fetchReviews();

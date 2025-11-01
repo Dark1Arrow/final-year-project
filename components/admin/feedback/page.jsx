@@ -61,7 +61,7 @@ const AdminReviewPage = () => {
 
         // ✅ Get all reviews (Admin access)
         const { data: reviewRes } = await axios.get(
-          `${API_BASE_URL}/api/v1/review/getAll`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/getAll`,
           { withCredentials: true }
         );
         const reviewsData = reviewRes?.data || [];
@@ -70,8 +70,8 @@ const AdminReviewPage = () => {
         // ✅ For each review, fetch related user and property
         for (const r of reviewsData) {
           const [userRes, propertyRes] = await Promise.all([
-            axios.get(`${API_BASE_URL}/api/v1/users/${r.user}`, { withCredentials: true }),
-            axios.get(`${API_BASE_URL}/api/v1/property/get/${r.property}`, { withCredentials: true }),
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${r.user}`, { withCredentials: true }),
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/get/${r.property}`, { withCredentials: true }),
           ]);
           
           const user = userRes?.data.data || {};

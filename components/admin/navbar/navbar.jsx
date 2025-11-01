@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import axios from 'axios';
-import { API_BASE_URL } from '';
+import { process.env.NEXT_PUBLIC_API_URL } from '';
 
 const LogoutIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out">
@@ -43,7 +43,7 @@ const Navbar = () => {
       console.log("Logging out...");
 
       await axios.post(
-        `${API_BASE_URL}/api/v1/users/logout`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/logout`,
         {},
         {
           withCredentials: true, // important for clearing cookies/session

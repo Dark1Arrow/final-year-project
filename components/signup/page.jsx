@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { API_BASE_URL } from "";
+import { process.env.NEXT_PUBLIC_API_URL } from "";
 
 const SignUpCard = () => {
   const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ const SignUpCard = () => {
     try {
       // Register user
       const response = await axios.post(
-        `${API_BASE_URL}/api/v1/users/register`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/register`,
         formData,
         {
           headers: {
@@ -51,7 +51,7 @@ const SignUpCard = () => {
 
       // Create wallet for the new user
       const walletResponse = await axios.post(
-        `${API_BASE_URL}/api/v1/wallet/create`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/wallet/create`,
         {
           userId: user._id, // ✅ Correct property
           walletName: "My Rental Wallet",

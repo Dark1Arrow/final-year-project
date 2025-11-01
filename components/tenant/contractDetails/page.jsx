@@ -43,7 +43,7 @@ const ConfirmButton = ({ contractId, status, refreshContracts }) => {
   const handleClick = async () => {
     try {
       await axios.put(
-        `${API_BASE_URL}/api/v1/booking/confirm/${contractId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/confirm/${contractId}`,
         {},
         { withCredentials: true }
       );
@@ -231,7 +231,7 @@ const App = () => {
 
   const fetchContracts = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/v1/booking/getAll`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/getAll`, {
         withCredentials: true,
       });
 
@@ -239,7 +239,7 @@ const App = () => {
       const contractsWithProperty = await Promise.all(
         res.data.data.map(async (booking) => {
           const propRes = await axios.get(
-            `${API_BASE_URL}/api/v1/property/get/${booking.property}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/get/${booking.property}`,
             { withCredentials: true }
           );
           return { ...booking, property: propRes.data.data };

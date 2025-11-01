@@ -61,7 +61,7 @@ const LandlordReviewPage = () => {
 
         // Fetch landlord properties
         const { data: propertyRes } = await axios.get(
-          `${API_BASE_URL}/api/v1/property/ownerProperty`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/ownerProperty`,
           { withCredentials: true }
         );
 
@@ -71,7 +71,7 @@ const LandlordReviewPage = () => {
         // Fetch reviews for each property
         for (const prop of properties) {
           const { data: reviewRes } = await axios.get(
-            `${API_BASE_URL}/api/v1/review/get/${prop._id}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/get/${prop._id}`,
             { withCredentials: true }
           );
 
@@ -79,7 +79,7 @@ const LandlordReviewPage = () => {
           for (const r of reviewsData) {
             // Fetch user (tenant) info
             const { data: userRes } = await axios.get(
-              `${API_BASE_URL}/api/v1/users/${r.user}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${r.user}`,
               { withCredentials: true }
             );
             const user = userRes?.data || {};

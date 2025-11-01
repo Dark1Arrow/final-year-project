@@ -58,7 +58,7 @@ const PaymentFormCard = ({ booking, onPayment, onClose }) => {
       const transactionId = `TXN-${Date.now()}`;
 
       const res = await axios.post(
-        `${API_BASE_URL}/api/v1/payment/create`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/create`,
         {
           bookingId: booking._id,
           userId: booking.user._id,
@@ -147,16 +147,16 @@ const FinancialDashboard = () => {
 
   const fetchBookings = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/v1/booking/getAll`, { withCredentials: true });
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/getAll`, { withCredentials: true });
       const data = res.data.data || [];
 
       // Fetch user, property, and payment details if exists
       const detailedBookings = await Promise.all(
         data.map(async (b) => {
           const [userRes, propertyRes, paymentRes] = await Promise.all([
-            axios.get(`${API_BASE_URL}/api/v1/users/${b.user}`, { withCredentials: true }),
-            axios.get(`${API_BASE_URL}/api/v1/property/get/${b.property}`, { withCredentials: true }),
-            b.payment ? axios.get(`${API_BASE_URL}/api/v1/payment/${b.payment}`, { withCredentials: true }) : Promise.resolve({ data: { data: null } }),
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${b.user}`, { withCredentials: true }),
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/get/${b.property}`, { withCredentials: true }),
+            b.payment ? axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/${b.payment}`, { withCredentials: true }) : Promise.resolve({ data: { data: null } }),
           ]);
           return {
             ...b,

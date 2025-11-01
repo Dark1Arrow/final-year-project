@@ -95,7 +95,7 @@ const CreateContractModal = ({ tenant, property, onClose, onCreate }) => {
     try {
       console.log(property)
       const res = await axios.post(
-        `${API_BASE_URL}/api/v1/booking/create`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/create`,
         {
           user: tenant._id, // user = tenant ID
           propertyId: property._id,
@@ -198,7 +198,7 @@ const App = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/v1/property/ownerProperty`, {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/ownerProperty`, {
           withCredentials: true,
         });
         const data = res.data.data;
@@ -225,7 +225,7 @@ const App = () => {
 
         const tenants = await Promise.all(
           property.interestedUsers.map(async (tId) => {
-            const res = await axios.get(`${API_BASE_URL}/api/v1/users/${tId}`, {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${tId}`, {
               withCredentials: true,
             });
             return res.data.data;

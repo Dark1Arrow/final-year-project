@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { API_BASE_URL } from "";
+import { process.env.NEXT_PUBLIC_API_URL } from "";
 
 const LogInCard = () => {
   const [role, setRole] = useState("tenant");
@@ -18,7 +18,7 @@ const LogInCard = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/users/login`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/login`, {
         username,
         email,
         password,

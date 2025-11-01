@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, Home, DollarSign, Zap, Clock, Send } from "lucide-react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; // ✅ Update if deployed
+const process.env.NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; // ✅ Update if deployed
 
 // 🏷️ Status Badge Function
 const getStatusBadge = (status) => {
@@ -36,7 +36,7 @@ const InterestButton = ({ propertyId, status, refreshData }) => {
     if (status === "Available" || status === "Pending") {
       try {
         const response = await axios.post(
-          `${API_BASE_URL}/api/v1/property/interest/${propertyId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/interest/${propertyId}`,
           {},
           { withCredentials: true }
         );
@@ -123,7 +123,7 @@ const App = () => {
   // 🔄 Fetch properties from backend
   const fetchProperties = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/v1/property/get`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/get`, {
         withCredentials: true,
       });
       setProperties(res.data.data || []);

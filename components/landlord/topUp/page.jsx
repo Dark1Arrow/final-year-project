@@ -27,7 +27,7 @@ const WalletTopUpForm = () => {
 
     try {
       const res = await axios.post(
-        `${API_BASE_URL}/api/v1/wallet/topup`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/wallet/topup`,
         {
           landlordId: formState.landlordId,
           walletName: formState.walletName,

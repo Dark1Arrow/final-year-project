@@ -13,7 +13,7 @@ const UserDashboard = () => {
     const fetchUserData = async () => {
       try {
         // 1️⃣ Fetch logged-in user data
-        const userRes = await axios.get(`${API_BASE_URL}/api/v1/users/userData`, {
+        const userRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/userData`, {
           withCredentials: true,
         });
 
@@ -22,7 +22,7 @@ const UserDashboard = () => {
 
         // 2️⃣ Fetch wallet data using user ID
         const walletRes = await axios.get(
-          `${API_BASE_URL}/api/v1/wallet/user/${user._id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/wallet/user/${user._id}`,
           { withCredentials: true }
         );
         setWalletData(walletRes.data.data);
@@ -40,7 +40,7 @@ const UserDashboard = () => {
   const handleCheckBalance = async () => {
     try {
       const res = await axios.get(
-        `${API_BASE_URL}/api/v1/wallet/balance/${walletData._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/wallet/balance/${walletData._id}`,
         { withCredentials: true }
       );
       alert(`Your balance: ₹${res.data.data.balance}`);

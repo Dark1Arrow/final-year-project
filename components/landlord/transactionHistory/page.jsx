@@ -93,7 +93,7 @@ const App = () => {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/v1/payment/all`, { withCredentials: true });
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/all`, { withCredentials: true });
         const { data } = res.data;
         // For each payment, fetch user and booking (property) separately
         const enhancedPayments = await Promise.all(
@@ -103,7 +103,7 @@ const App = () => {
 
             try {
               // Fetch user info
-              const userRes = await axios.get(`${API_BASE_URL}/api/v1/users/${payment.user}`, { withCredentials: true });
+              const userRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${payment.user}`, { withCredentials: true });
               userData = userRes.data?.data || null;
             } catch {
               userData = null;
@@ -111,7 +111,7 @@ const App = () => {
             console.log(payment.property)
             try {
               // Fetch booking/property info
-              const bookingRes = await axios.get(`${API_BASE_URL}/api/v1/property/get/${payment.property}`, { withCredentials: true });
+              const bookingRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/get/${payment.property}`, { withCredentials: true });
               bookingData = bookingRes.data?.data || null;
             } catch {
               bookingData = null;

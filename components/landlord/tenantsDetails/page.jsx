@@ -170,7 +170,7 @@ const App = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `${API_BASE_URL}/api/v1/booking/getLandlordBooking`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/getLandlordBooking`,
           { withCredentials: true }
         );
 
@@ -180,10 +180,10 @@ const App = () => {
           bookingsData.map(async (booking) => {
             try {
               const [propertyRes, tenantRes] = await Promise.all([
-                axios.get(`${API_BASE_URL}/api/v1/property/get/${booking.property}`, {
+                axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/get/${booking.property}`, {
                   withCredentials: true,
                 }),
-                axios.get(`${API_BASE_URL}/api/v1/users/${booking.user}`, {
+                axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${booking.user}`, {
                   withCredentials: true,
                 }),
               ]);

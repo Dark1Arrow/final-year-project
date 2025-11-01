@@ -10,7 +10,7 @@ const LandlordTable = () => {
   // Fetch all landlords
   const fetchLandlords = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/v1/users/landlord`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/landlord`, {
         withCredentials: true,
       }); // 👈 your backend should return all landlords
       setLandlordData(res.data.data);
@@ -25,7 +25,7 @@ const LandlordTable = () => {
 
     try {
       const res = await axios.put(
-        `${API_BASE_URL}/api/v1/users/landlord/${id}/status`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/landlord/${id}/status`,
         { status: newStatus },
         { withCredentials: true }
       );

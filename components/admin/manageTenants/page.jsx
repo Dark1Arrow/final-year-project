@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { API_BASE_URL } from "../";
+
 import axios from "axios";
 
 const TenantTable = () => {
@@ -10,7 +10,7 @@ const TenantTable = () => {
   // Fetch tenants
   const fetchTenants = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/v1/users/tenant`,{withCredentials :true}); // 👈 backend endpoint
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/tenant`,{withCredentials :true}); // 👈 backend endpoint
       setTenantData(res.data.data);
     } catch (error) {
       console.error("Error fetching tenants:", error);
@@ -21,7 +21,7 @@ const TenantTable = () => {
   const handleStatusChange = async (id, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
-      const res = await axios.put(`${API_BASE_URL}/api/v1/users/tenant/${id}/status`, { status: newStatus },{withCredentials: true});
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/tenant/${id}/status`, { status: newStatus },{withCredentials: true});
       setTenantData((prev) =>
         prev.map((t) => (t._id === id ? { ...t, status: newStatus } : t))
       );

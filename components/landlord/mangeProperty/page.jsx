@@ -209,7 +209,7 @@ const App = () => {
 
   const fetchProperties = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/v1/property/ownerProperty`, { withCredentials: true });
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/ownerProperty`, { withCredentials: true });
       setProperties(res.data.data);
     } catch (error) {
       console.error("Error fetching properties:", error);
@@ -221,7 +221,7 @@ const App = () => {
   const handleAction = async (action, property) => {
     if (action === "Delete") {
       try {
-        await axios.delete(`${API_BASE_URL}/api/v1/property/delete/${property._id}`, { withCredentials: true });
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/delete/${property._id}`, { withCredentials: true });
         setProperties(prev => prev.filter(p => p._id !== property._id));
       } catch (error) {
         console.error("Error deleting property:", error);
@@ -238,13 +238,13 @@ const App = () => {
     try {
       if (editProperty) {
         // Update
-        const res = await axios.put(`${API_BASE_URL}/api/v1/property/update/${editProperty._id}`, newPropertyData, { withCredentials: true });
+        const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/update/${editProperty._id}`, newPropertyData, { withCredentials: true });
         setProperties(prev => prev.map(p => p._id === editProperty._id ? res.data.data : p));
         setEditProperty(null);
       } else {
         // Add
         console.log(newPropertyData)
-        const res = await axios.post(`${API_BASE_URL}/api/v1/property/create`, newPropertyData, {
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/property/create`, newPropertyData, {
           headers: {
             "Content-Type": "application/json",
           },

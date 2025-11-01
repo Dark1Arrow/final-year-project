@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiDownload, FiCreditCard } from "react-icons/fi";
-import { API_BASE_URL } from "@/app/api/constants";
+
 
 const WalletDashboard = () => {
   const [walletData, setWalletData] = useState([]);

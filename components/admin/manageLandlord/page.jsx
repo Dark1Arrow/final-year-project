@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { API_BASE_URL } from "@/app/api/constants";
+
 
 const LandlordTable = () => {
   const [landlordData, setLandlordData] = useState([]);

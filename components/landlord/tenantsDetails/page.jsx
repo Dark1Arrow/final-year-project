@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Eye, DollarSign, User, Home, Zap, X, FileText } from "lucide-react";
-import { API_BASE_URL } from "@/app/api/constants";
+
 
 // Reusable view button
 const ViewActionButton = ({ onClick, label }) => (

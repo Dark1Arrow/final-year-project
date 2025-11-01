@@ -12,7 +12,7 @@ import {
   Home,
   DollarSign,
 } from "lucide-react";
-import { API_BASE_URL } from "@/app/api/constants";
+
 // change if your backend is hosted
 
 // ---------------------- COMPONENTS ----------------------

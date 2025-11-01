@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Eye, DollarSign, Calendar, Zap, TrendingUp, Home, User } from "lucide-react";
-import { API_BASE_URL } from "@/app/api/constants";
+
 import axios from "axios";
 
 const ViewActionButton = ({ onClick, label }) => (

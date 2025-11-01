@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Search, Star, Loader2, User, Home, MessageSquare, Zap } from "lucide-react";
 import axios from "axios";
-import { API_BASE_URL } from "@/app/api/constants";
+
 
 const RatingStars = ({ rating }) => (
   <div className="flex space-x-0.5">

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Star, MessageSquarePlus, Trash2 } from "lucide-react";
-import { API_BASE_URL } from "@/app/api/constants";
+
 
 // Rating stars component
 const RatingStars = ({ rating }) => (

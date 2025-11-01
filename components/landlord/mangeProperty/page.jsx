@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Plus, Eye, Pencil, Trash2, Zap, X, Home, MapPin, DollarSign } from "lucide-react";
-import { API_BASE_URL } from "@/app/api/constants";
+
 
 const ActionButton = ({ icon: Icon, label, onClick, color }) => (
   <button

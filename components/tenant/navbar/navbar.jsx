@@ -36,7 +36,6 @@ const Navbar = () => {
     { name: 'Property Details', href: '/tenant/propertyDetails' },
     { name: 'Contract Details', href: '/tenant/contractDetails' },
     { name: 'Pay Rent', href: '/tenant/payRent' },
-    { name: 'Transaction History', href: '/tenant/transactionHistory' },
     { name: 'Feedback', href: '/tenant/feedback' },
   ];
 

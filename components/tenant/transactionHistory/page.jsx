@@ -1,214 +1,278 @@
-"use client"
-import React, { useState } from 'react';
-import { Search, DollarSign, Clock, Home, Eye, CreditCard } from 'lucide-react';
+"use client";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Star, MessageSquarePlus, Trash2 } from "lucide-react";
 
-const initialTransactions = [
-  { id: 'F39493', name: 'Flat #21', type: 'Flat', amount: 500, date: '01 Sep 25', status: 'Success' },
-  { id: 'FR4340', name: 'Flat #21', type: 'pg', amount: 500, date: '01 Sep 25', status: 'Pending' },
-  { id: 'FR4341', name: 'Studio C', type: 'Studio', amount: 650, date: '01 Oct 25', status: 'Pending' },
-  { id: 'T2001A', name: 'Villa #9', type: 'Villa', amount: 1200, date: '01 Aug 25', status: 'Failed' },
-];
+// Rating stars component
+const RatingStars = ({ rating }) => (
+  <div className="flex items-center space-x-1">
+    {[...Array(5)].map((_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300 fill-gray-100"
+        }`}
+      />
+    ))}
+  </div>
+);
 
-const getStatusBadge = (status) => {
-  let colorClass = '';
-  switch (status) {
-    case 'Success':
-      colorClass = 'bg-teal-100 text-teal-800';
-      break;
-    case 'Pending':
-      colorClass = 'bg-orange-100 text-orange-800';
-      break;
-    case 'Failed':
-      colorClass = 'bg-red-100 text-red-800';
-      break;
-    default:
-      colorClass = 'bg-gray-100 text-gray-800';
-  }
-  return (
-    <span
-      className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${colorClass}`}
-    >
-      {status}
-    </span>
-  );
-};
+// Modal for Add/Edit Feedback
+const FeedbackModal = ({ isOpen, onClose, initialData, onSubmit }) => {
+  const [formData, setFormData] = useState({
+    propertyId: "",
+    rating: 0,
+    comment: "",
+  });
 
-const PayNowButton = ({ transactionId, status }) => {
-  const handleClick = () => {
-    console.log(`Initiating payment for transaction ID: ${transactionId}`);
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        propertyId: initialData.propertyId || "",
+        rating: initialData.rating || 0,
+        comment: initialData.comment || "",
+      });
+    } else {
+      setFormData({ propertyId: "", rating: 0, comment: "" });
+    }
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
-  const isDisabled = status !== 'Pending';
+
+  const handleRatingChange = (val) => {
+    setFormData((prev) => ({ ...prev, rating: val }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+    onClose();
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={isDisabled}
-      className={`
-        px-4 py-2 text-sm font-medium rounded-xl transition duration-300 flex items-center justify-center min-w-[100px]
-        ${isDisabled 
-          ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-          : 'bg-green-500 text-white hover:bg-green-600 shadow-md hover:shadow-lg'
-        }
-      `}
-    >
-      <CreditCard className="w-4 h-4 mr-2" />
-      Pay now
-    </button>
-  );
-};
-
-const MobileTransactionCard = ({ transaction, handleView }) => {
-  return (
-    <div className="bg-white p-5 mb-4 rounded-xl shadow-lg border border-gray-100 md:hidden">
-      <div className="flex items-center justify-between border-b pb-3 mb-3">
-        <h3 className="text-xl font-bold text-gray-800 flex items-center">
-          <DollarSign className="w-5 h-5 mr-2 text-green-500" />
-          ${transaction.amount}
-        </h3>
-        {getStatusBadge(transaction.status)}
-      </div>
-
-      <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-600">
-        <div className="flex items-center col-span-2">
-          <Clock className="w-4 h-4 mr-2 text-purple-400" />
-          <span className="font-medium">ID:</span>
-          <span className="ml-1 text-gray-900 font-bold">{transaction.id}</span>
-        </div>
-        <div className="flex items-center">
-          <Home className="w-4 h-4 mr-2 text-blue-400" />
-          <span className="font-medium">Property:</span>
-          <span className="ml-1 text-gray-900">{transaction.name}</span>
-        </div>
-        <div className="flex items-center">
-          <span className="font-medium">Date:</span>
-          <span className="ml-1 text-gray-900">{transaction.date}</span>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
-        <button
-            onClick={() => handleView(transaction.id)}
-            aria-label="View Contract"
-            className="p-2 rounded-full transition-colors duration-200 text-blue-600 hover:bg-blue-100"
-        >
-            <Eye className="w-5 h-5" />
-        </button>
-        <PayNowButton transactionId={transaction.id} status={transaction.status} />
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+        <h2 className="text-2xl font-semibold mb-5">
+          {initialData ? "Edit Feedback" : "Add Feedback"}
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Property</label>
+            <input
+              type="text"
+              name="propertyId"
+              value={formData.propertyId}
+              onChange={handleChange}
+              required
+              placeholder="Enter property name"
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Rating</label>
+            <div className="flex space-x-2">
+              {[...Array(5)].map((_, i) => {
+                const val = i + 1;
+                return (
+                  <Star
+                    key={i}
+                    onClick={() => handleRatingChange(val)}
+                    className={`w-6 h-6 cursor-pointer transition-colors ${
+                      val <= formData.rating
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-300 hover:text-yellow-300 hover:fill-yellow-300"
+                    }`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Comment</label>
+            <textarea
+              name="comment"
+              value={formData.comment}
+              onChange={handleChange}
+              required
+              rows="3"
+              placeholder="Write your feedback..."
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="flex justify-end gap-3 mt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              {initialData ? "Save" : "Submit"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 };
 
 const App = () => {
-  const [transactions, setTransactions] = useState(initialTransactions);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [reviews, setReviews] = useState([]);
+  const [search, setSearch] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
 
-  const handleView = (id) => console.log(`Viewing transaction details for ID: ${id}`);
+  const fetchReviews = async () => {
+    try {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/get`, {
+        withCredentials: true,
+      });
+      setReviews(res.data.data || []);
+    } catch (err) {
+      console.error("Error fetching reviews:", err.message);
+    }
+  };
 
+  useEffect(() => {
+    fetchReviews();
+  }, []);
 
-  const filteredTransactions = transactions.filter(transaction => 
-    transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleSubmit = async (data) => {
+    try {
+      if (editData) {
+        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/${editData._id}`, data, {
+          withCredentials: true,
+        });
+      } else {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/create`, data, {
+          withCredentials: true,
+        });
+      }
+      fetchReviews();
+    } catch (err) {
+      console.error("Error saving feedback:", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this feedback?")) return;
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/review/${id}`, {
+        withCredentials: true,
+      });
+      fetchReviews();
+    } catch (err) {
+      console.error("Error deleting feedback:", err);
+    }
+  };
+
+  const filtered = reviews.filter(
+    (r) =>
+      r.propertyId?.toLowerCase().includes(search.toLowerCase()) ||
+      r.comment?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-['Inter']">
+    <div className="min-h-screen bg-gray-50 p-6 font-[Inter]">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 flex items-center">
-          Your Transactions
-        </h1>
-        
-        <div className="flex flex-col sm:flex-row justify-end items-center mb-8 gap-3 sm:gap-4">
-            <div className="flex-grow sm:flex-grow-0 max-w-sm w-full relative">
-                <input
-                    type="text"
-                    placeholder="Search by ID / Property Name"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-100 text-gray-800 transition-shadow duration-300"
-                />
-            </div>
-            <button
-                className="w-full sm:w-auto items-center px-6 py-3 text-white bg-blue-600 rounded-xl shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out font-medium"
-            >
-                Search
-            </button>
+        <h1 className="text-3xl font-bold mb-6">Tenant Reviews</h1>
+
+        {/* Search + Add */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search property or comment..."
+            className="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={() => {
+              setEditData(null);
+              setIsModalOpen(true);
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
+          >
+            <MessageSquarePlus className="w-5 h-5" />
+            Add Feedback
+          </button>
         </div>
 
-        <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow-2xl border border-gray-200">
+        {/* Table */}
+        <div className="overflow-x-auto bg-white rounded-xl shadow-xl border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200">
-            
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-100">
               <tr>
-                {['Transaction ID', 'Name', 'Type', 'Amount', 'Date', 'Status', 'Action'].map((header) => (
+                {["Property", "Rating", "Comment", "Date", "Action"].map((h) => (
                   <th
-                    key={header}
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    key={h}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider"
                   >
-                    {header}
+                    {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-blue-50 transition-colors duration-150">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {transaction.id}
+            <tbody className="divide-y divide-gray-100">
+              {filtered.map((r) => (
+                <tr
+                  key={r._id}
+                  className="hover:bg-blue-50 transition-colors duration-200"
+                >
+                  <td className="px-6 py-4 text-gray-800 font-medium">{r.property}</td>
+                  <td className="px-6 py-4">
+                    <RatingStars rating={r.rating} />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {transaction.name}
+                  <td className="px-6 py-4 text-gray-700 italic">{r.comment}</td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {new Date(r.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
-                    {transaction.type}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                    ${transaction.amount}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {transaction.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {getStatusBadge(transaction.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center space-x-2">
+                  <td className="px-6 py-4 flex gap-3">
                     <button
-                        onClick={() => handleView(transaction.id)}
-                        aria-label="View Transaction"
-                        className="p-2 rounded-full transition-colors duration-200 text-gray-600 hover:bg-gray-100"
+                      onClick={() => {
+                        setEditData(r);
+                        setIsModalOpen(true);
+                      }}
+                      className="text-blue-600 hover:underline font-medium"
                     >
-                        <Eye className="w-5 h-5" />
+                      Edit
                     </button>
-                    {transaction.status === 'Pending' && (
-                        <PayNowButton transactionId={transaction.id} status={transaction.status} />
-                    )}
+                    <button
+                      onClick={() => handleDelete(r._id)}
+                      className="text-red-600 hover:underline font-medium flex items-center gap-1"
+                    >
+                      <Trash2 className="w-4 h-4" /> Delete
+                    </button>
                   </td>
                 </tr>
               ))}
-              {filteredTransactions.length === 0 && (
+              {filtered.length === 0 && (
                 <tr>
-                    <td colSpan="7" className="text-center py-6 text-gray-500">No transactions found matching your search.</td>
+                  <td colSpan="5" className="text-center py-6 text-gray-500">
+                    No feedback found.
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-
-        <div className="md:hidden space-y-4">
-          {filteredTransactions.map((transaction) => (
-            <MobileTransactionCard 
-                key={transaction.id} 
-                transaction={transaction} 
-                handleView={handleView} 
-            />
-          ))}
-          {filteredTransactions.length === 0 && (
-             <div className="text-center py-6 text-gray-500 bg-white rounded-xl shadow-lg">No transactions found matching your search.</div>
-          )}
-        </div>
       </div>
+
+      <FeedbackModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialData={editData}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };

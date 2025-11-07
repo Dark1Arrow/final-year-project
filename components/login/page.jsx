@@ -69,7 +69,7 @@ const LogInCard = () => {
 
   return (
     <>
-      <div >
+      <div className="absolute top-4 left-4" >
         <a href="/" className="flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"

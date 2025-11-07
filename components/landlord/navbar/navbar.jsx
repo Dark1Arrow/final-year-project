@@ -122,7 +122,7 @@ const Navbar = () => {
                 </g>
               </svg>
               <span className="text-2xl font-bold tracking-wide text-gray-800">
-                HomeVerseEstate
+                HomeVerse
               </span>
             </a>
           </div>

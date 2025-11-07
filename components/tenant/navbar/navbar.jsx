@@ -104,7 +104,7 @@ const Navbar = () => {
                 width="40"
                 height="40"
               >
-                <g id="Crash">
+                <g id="HomeVerse">
                   <path fill="#42a5f5" d="M26 16a2 2 0 0 0-4 0v1h4z" />
                   <path
                     fill="#42a5f5"
@@ -121,7 +121,7 @@ const Navbar = () => {
                 </g>
               </svg>
               <span className="text-2xl font-bold tracking-wide text-gray-800">
-                CrashEstate
+                HomeVerseEstate
               </span>
             </a>
           </div>

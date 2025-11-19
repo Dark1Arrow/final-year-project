@@ -11,7 +11,7 @@ const topFeatures = [
     title: '', 
     description: '', 
     isImage: true, 
-    imageSrc: '/images/handshake.png', 
+    imageSrc: '/handshake.svg', 
   },
   {
     icon: MessageSquareText,
@@ -50,7 +50,7 @@ const AccessLevelSection = () => {
           {topFeatures.map((feature, index) => (
             <div key={index} className="flex flex-col items-center max-w-[200px] text-center">
               {feature.isImage ? (
-                <img src={feature.imageSrc} alt="Handshake" className="w-24 h-24 mb-4 object-contain" />
+                <img src={feature.imageSrc} alt="Handshake" className="w-54 h-54 mb-4 object-contain" />
               ) : (
                 <feature.icon className="w-24 h-24 text-gray-800 mb-4" />
               )}
